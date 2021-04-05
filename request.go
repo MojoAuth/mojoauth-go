@@ -77,9 +77,7 @@ func (lr Mojoauth) NewPostReqWithToken(path string, body interface{}, queries ..
 		Headers: map[string]string{
 			"content-Type":  "application/json",
 			"Authorization": "Bearer " + lr.Context.Token,
-		},
-		QueryParams: map[string]string{
-			"X-API-Key": lr.Context.ApiKey,
+			"X-API-Key":     lr.Context.ApiKey,
 		},
 		Body: encodedBody,
 	}

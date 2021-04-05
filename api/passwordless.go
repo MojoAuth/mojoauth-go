@@ -83,25 +83,8 @@ func (mojo Mojoauth) SigninWithEmailOTP(body interface{}, queries ...interface{}
 }
 
 func (mojo Mojoauth) VerifyToken(body interface{}, queries ...interface{}) (*httprutils.Response, error) {
+
 	request, err := mojo.Client.NewPostReqWithToken("/token/verify", body)
-	if err != nil {
-		return nil, err
-	}
-
-	for _, arg := range queries {
-		allowedQueries := map[string]bool{
-			"jwttoken": true,
-		}
-		validatedQueries, err := httprutils.Validate(allowedQueries, arg)
-
-		if err != nil {
-			return nil, err
-		}
-		for k, v := range validatedQueries {
-			request.QueryParams[k] = v
-		}
-	}
-
-	response, err := httprutils.TimeoutClient.Send(*request)
-	return response, err
+	res, err := httprutils.TimeoutClient.Send(*request)
+	return res, err
 }
