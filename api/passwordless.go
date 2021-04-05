@@ -82,7 +82,7 @@ func (mojo Mojoauth) SigninWithEmailOTP(body interface{}, queries ...interface{}
 	return response, err
 }
 
-func (mojo Mojoauth) verifyToken(body interface{}, queries ...interface{}) (*httprutils.Response, error) {
+func (mojo Mojoauth) VerifyToken(body interface{}, queries ...interface{}) (*httprutils.Response, error) {
 	request, err := mojo.Client.NewPostReqWithToken("/token/verify", body)
 	if err != nil {
 		return nil, err
@@ -105,4 +105,3 @@ func (mojo Mojoauth) verifyToken(body interface{}, queries ...interface{}) (*htt
 	response, err := httprutils.TimeoutClient.Send(*request)
 	return response, err
 }
-

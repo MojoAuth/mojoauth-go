@@ -21,13 +21,13 @@ func PasswordlessAuth() {
 		ApiKey: "<Enter ApiKey>",
 	}
 
-	lrclient, err := go_mojoauth.NewMojoAuth(&cfg)
+	mojoclient, err := go_mojoauth.NewMojoAuth(&cfg)
 	if err != nil {
 		errors = errors + err.(mojoerror.Error).OrigErr().Error()
 		//		respCode = 500
 	}
 
-	res, err := api.Mojoauth{lrclient}.SigninWithMagicLink(
+	res, err := api.Mojoauth{mojoclient}.SigninWithMagicLink(
 		[]byte(`{"email":"at@mail7.io"}`),
 	)
 	if err != nil {
