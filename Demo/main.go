@@ -21,15 +21,16 @@ func PasswordlessAuth() {
 		ApiKey: "<Enter ApiKey>",
 	}
 
-	mojoclient, err := go_mojoauth.NewMojoAuth(&cfg)
+	mojoClient, err := go_mojoauth.NewMojoAuth(&cfg, map[string]string{"token": "Enter your token"})
 	if err != nil {
 		errors = errors + err.(mojoerror.Error).OrigErr().Error()
 		//		respCode = 500
 	}
 
-	res, err := api.Mojoauth{mojoclient}.SigninWithMagicLink(
-		[]byte(`{"email":"at@mail7.io"}`),
-	)
+	res, err := api.Mojoauth{mojoClient}.VerifyToken(map[string]string{
+
+		// add optional body parameters as needed
+	})
 	if err != nil {
 		errors = errors + err.(mojoerror.Error).OrigErr().Error()
 		//		respCode = 500
