@@ -21,7 +21,7 @@ func PasswordlessAuth() {
 		ApiKey: "<Enter Your APIKey>",
 	}
 
-	mojoClient, err := go_mojoauth.NewMojoAuth(&cfg, map[string]string{"token": "Enter your token"})
+	mojoClient, err := go_mojoauth.NewMojoAuth(&cfg)
 	if err != nil {
 		errors = errors + err.(mojoerror.Error).OrigErr().Error()
 		//		respCode = 500
