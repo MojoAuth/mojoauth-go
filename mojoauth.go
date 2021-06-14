@@ -24,6 +24,7 @@ type Config struct {
 // Context struct is a field in the MojoAuth struct
 type Context struct {
 	ApiKey string
+	Jwks string
 	Token  string
 }
 
