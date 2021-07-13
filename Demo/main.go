@@ -18,19 +18,17 @@ func PasswordlessAuth() {
 	//respCode := 200
 
 	cfg := go_mojoauth.Config{
-		ApiKey: "<Enter ApiKey>",
+		ApiKey: "<Enter Your APIKey>",
 	}
 
-	mojoClient, err := go_mojoauth.NewMojoAuth(&cfg, map[string]string{"token": "Enter your token"})
+	mojoClient, err := go_mojoauth.NewMojoAuth(&cfg)
 	if err != nil {
 		errors = errors + err.(mojoerror.Error).OrigErr().Error()
 		//		respCode = 500
 	}
 
-	res, err := api.Mojoauth{mojoClient}.VerifyToken(map[string]string{
 
-		// add optional body parameters as needed
-	})
+	res, err := api.Mojoauth{mojoClient}.VerifyToken("<Enter Token>")
 	if err != nil {
 		errors = errors + err.(mojoerror.Error).OrigErr().Error()
 		//		respCode = 500
@@ -41,6 +39,7 @@ func PasswordlessAuth() {
 
 		return
 	}
-	fmt.Println(res.Body)
+	fmt.Println(res.IsValid)
+
 
 }
