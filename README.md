@@ -19,7 +19,7 @@ Install all package dependencies by running `go get ./...` in the root folder of
 
 Take a peek:
 
-Before making any API calls, the MojoAuth API client must be initialized with your Loginradius API key.
+Before making any API calls, the MojoAuth API client must be initialized with your MojoAuth API key.
 
 Sample code:
 
