@@ -11,7 +11,7 @@
 
 ## Documentation
 
-* [Configuration](https://mojoauth.com/docs/) - Everything you need to begin using the MojoAuth SDK.
+* [Configuration](https://mojoauth.com/docs/guides/nodejs/) - Everything you need to begin using the MojoAuth SDK.
 
 ## Installation
 
