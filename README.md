@@ -1,6 +1,6 @@
 <p align="center">
   <a href="https://www.mojoauth.com">
-    <img alt="MojoAuth" src="https://mojoauth.com/assets/images/logo.svg" width="200" />
+    <img alt="MojoAuth" src="https://mojoauth.com/blog/assets/images/logo.svg" width="200" />
   </a>
 </p>
 
