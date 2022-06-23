@@ -2,10 +2,11 @@ package api
 
 import (
 	"encoding/json"
+	"log"
+
 	go_mojoauth "github.com/mojoauth/go-sdk"
 	"github.com/mojoauth/go-sdk/httprutils"
 	"github.com/mojoauth/go-sdk/mojobody"
-	"log"
 
 	"github.com/dgrijalva/jwt-go"
 
@@ -15,26 +16,43 @@ import (
 type Mojoauth struct {
 	Client *go_mojoauth.Mojoauth
 }
-func (mojo Mojoauth) VerifyEmailOTP(body interface{}, queries ...interface{}) (*httprutils.Response, error) {
+
+func (mojo Mojoauth) VerifyEmailOTP(body interface{}) (*httprutils.Response, error) {
 	request, err := mojo.Client.NewPostReq("/users/emailotp/verify", body)
 	if err != nil {
 		return nil, err
 	}
 
-	for _, arg := range queries {
-		allowedQueries := map[string]bool{}
-		validatedQueries, err := httprutils.Validate(allowedQueries, arg)
+	response, err := httprutils.TimeoutClient.Send(*request)
+	return response, err
+}
 
-		if err != nil {
-			return nil, err
-		}
-		for k, v := range validatedQueries {
-			request.QueryParams[k] = v
-		}
+func (mojo Mojoauth) VerifyPhoneOTP(body interface{}) (*httprutils.Response, error) {
+	request, err := mojo.Client.NewPostReq("/users/phone/verify", body)
+	if err != nil {
+		return nil, err
 	}
 
 	response, err := httprutils.TimeoutClient.Send(*request)
 	return response, err
+}
+
+func (mojo Mojoauth) ResendEmailOTP(body interface{}) (*httprutils.Response, error) {
+	req, err := mojo.Client.NewPostReq("/users/emailotp/resend", body)
+	if err != nil {
+		return nil, err
+	}
+	res, err := httprutils.TimeoutClient.Send(*req)
+	return res, err
+}
+
+func (mojo Mojoauth) ResendPhoneOTP(body interface{}) (*httprutils.Response, error) {
+	req, err := mojo.Client.NewPostReq("/users/phone/resend", body)
+	if err != nil {
+		return nil, err
+	}
+	res, err := httprutils.TimeoutClient.Send(*req)
+	return res, err
 }
 
 func (mojo Mojoauth) PingStatus(queries interface{}) (*httprutils.Response, error) {
@@ -57,7 +75,10 @@ func (mojo Mojoauth) SigninWithMagicLink(body interface{}, queries ...interface{
 	}
 
 	for _, arg := range queries {
-		allowedQueries := map[string]bool{}
+		allowedQueries := map[string]bool{
+			"language":     true,
+			"redirect_url": true,
+		}
 		validatedQueries, err := httprutils.Validate(allowedQueries, arg)
 
 		if err != nil {
@@ -79,7 +100,31 @@ func (mojo Mojoauth) SigninWithEmailOTP(body interface{}, queries ...interface{}
 
 	for _, arg := range queries {
 		allowedQueries := map[string]bool{
-			"email": true,
+			"language": true,
+		}
+		validatedQueries, err := httprutils.Validate(allowedQueries, arg)
+
+		if err != nil {
+			return nil, err
+		}
+		for k, v := range validatedQueries {
+			request.QueryParams[k] = v
+		}
+	}
+
+	response, err := httprutils.TimeoutClient.Send(*request)
+	return response, err
+}
+
+func (mojo Mojoauth) SigninWithPhoneOTP(body interface{}, queries ...interface{}) (*httprutils.Response, error) {
+	request, err := mojo.Client.NewPostReq("/users/phone", body)
+	if err != nil {
+		return nil, err
+	}
+
+	for _, arg := range queries {
+		allowedQueries := map[string]bool{
+			"language": true,
 		}
 		validatedQueries, err := httprutils.Validate(allowedQueries, arg)
 
@@ -103,15 +148,12 @@ func (mojo Mojoauth) SigninWithEmailOTP(body interface{}, queries ...interface{}
 //}
 func (mojo Mojoauth) GetJwks() (*httprutils.Response, error) {
 
-
 	req := mojo.Client.NewGetReq("/token/jwks", nil)
 	res, err := httprutils.TimeoutClient.Send(*req)
 	return res, err
 }
 
-
-
-func JWTVerifier(jwtB64 string,body string)(*mojobody.TokenResponse, error) {
+func JWTVerifier(jwtB64 string, body string) (*mojobody.TokenResponse, error) {
 	var jwksJSON json.RawMessage = []byte(body)
 
 	// Create the JWKS from the resource at the given URL.
@@ -120,7 +162,6 @@ func JWTVerifier(jwtB64 string,body string)(*mojobody.TokenResponse, error) {
 		log.Fatalf("Failed to create JWKS from resource at the given URL.\nError: %s", err.Error())
 		return nil, err
 	}
-
 
 	// Parse the JWT.
 	token, err := jwt.Parse(jwtB64, jwks.KeyFunc)
@@ -132,35 +173,31 @@ func JWTVerifier(jwtB64 string,body string)(*mojobody.TokenResponse, error) {
 	// Check if the token is valid.
 	response := mojobody.TokenResponse{IsValid: token.Valid, Token: jwtB64}
 
-	return &response,nil
+	return &response, nil
 
 }
 
-func (mojo Mojoauth) VerifyToken(token string)(*mojobody.TokenResponse, error){
-	if mojo.Client.Context.Jwks != ""{
+func (mojo Mojoauth) VerifyToken(token string) (*mojobody.TokenResponse, error) {
+	if mojo.Client.Context.Jwks != "" {
 		res, err := JWTVerifier(token, mojo.Client.Context.Jwks)
-		if err != nil{
+		if err != nil {
 			return nil, err
 		}
-		return res,nil
+		return res, nil
 
-
-
-	}else{
+	} else {
 		res, err := Mojoauth{mojo.Client}.GetJwks()
 		if err != nil {
 			return nil, err
 			//		respCode = 500
-		}else{
+		} else {
 			mojo.Client.Context.Jwks = res.Body
 			res, err := JWTVerifier(token, res.Body)
-			if err != nil{
+			if err != nil {
 				return nil, err
 			}
-			return res,nil
+			return res, nil
 		}
 	}
 
 }
-
-
